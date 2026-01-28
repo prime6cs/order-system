@@ -36,7 +36,7 @@
     <div id="result" style="margin-top:10px;"></div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         // you can change this variable to use your own config here
         const firebaseConfig = {
@@ -49,6 +49,9 @@
         };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        onAuthStateChanged(auth, (user) => {
+            if (user) window.location.href = "main.html";
+        }
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
         const btn = document.getElementById("login");
