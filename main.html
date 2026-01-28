@@ -36,12 +36,17 @@
       const oDiv = document.getElementById("order");
       onAuthStateChanged(auth, async (user) => {
         if (!user) {
-          status.textContent = "Unauthorized, please sign in with the correct email";
+          status.textContent = "Unauthorized. Please sign in.";
+          return;
+        }
+        const email = user.email || "";
+        // restrict access to 1 email domain only (you can change this/remove it)
+        if (!email.endsWith("@tsis.ac.th")) {
+          status.textContent = "Unauthorized email. Please logout and sign in with the correct email.";
           return;
         }
         status.textContent = "Checking for orders...";
         try {
-          const email = user.email;
           const q = query(collection(db, "orders"), where("Email Address", "==", email));
           const sn = await getDocs(q);
           if (!sn.empty) {
