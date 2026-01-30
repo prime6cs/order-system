@@ -16,11 +16,13 @@
   <body>
     <h1 id="status">Please wait...</h1>
     <div id="order"></div>
+    <h1 id="globalqueue"></h1>
+    <p>Your current position in the queue: -</p>
     <button id="logout">Logout</button>
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
       import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-      import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      import { getFirestore, collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
       const firebaseConfig = {
       apiKey: "AIzaSyB5h1wU1fc-UF540ZtCO3T2ubiDYiGXqIg",
       authDomain: "db-3dprint.firebaseapp.com",
@@ -46,6 +48,13 @@
           return;
         }
         status.textContent = "Checking for orders...";
+        // you may want to change the db name here for the global order queue length
+        const mainQueue = doc(db, "orders", "extra");
+        const mainInfo = await getDoc(mainQueue);
+        if (mainInfo.exists()) {
+          const cur = mainInfo.data().globalQueueLength;
+          document.getElementById("globalqueue").textContent = `Total queue length: ${cur} order(s)`;
+        }
         try {
           const q = query(collection(db, "orders"), where("Email Address", "==", email));
           const sn = await getDocs(q);
