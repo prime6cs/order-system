@@ -15,7 +15,7 @@
   </head>
   <body>
     <h1 id="status">Please wait...</h1>
-    <div id="order"></div>
+    <pre id="order" style="white-space: pre-wrap;"></pre>
     <h1 id="globalqueue"></h1>
     <p>Your current position in the queue: -</p>
     <button id="logout">Logout</button>
@@ -59,9 +59,14 @@
           const q = query(collection(db, "orders"), where("Email Address", "==", email));
           const sn = await getDocs(q);
           if (!sn.empty) {
-            oDiv.textContent = "Found order";
+            status.textContent = `Found ${snapshot.size} order(s):`;
+            oDiv.textContent = "";
+            sn.docs.forEach((doc, idx) => {
+              const info = doc.data();
+              oDiv.textContent += `Order No.${idx+1} (${doc.id})\n`+JSON.stringify(info,null,2)+"\n\n";
+            });
           } else {
-            oDiv.textContent = "You currently have no orders";
+            status.textContent = "You currently have no orders";
           }
         } catch (e) {
           console.error(e);
