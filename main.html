@@ -30,6 +30,23 @@
     font-weight: bold;
     margin-top: 5px;
   }
+  .order-card {
+    background: #f3f3f3;
+    padding: 12px;
+    margin: 12px 0;
+    border-radius: 6px;
+    font-family: monospace;
+  }
+
+  .order-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 10px;
+  }
+
+  .order-row span:first-child {
+    font-weight: bold;
+  }
   #status {
     text-align: right;
     font-size: 18px;
@@ -104,22 +121,45 @@
           const q = query(collection(db, "orders"), where("Email Address", "==", email));
           const sn = await getDocs(q);
           if (!sn.empty) {
-            oDiv.textContent = "";
-            let minQueuePos = null;
-            sn.docs.forEach((doc, idx) => {
-              const info = doc.data();
-              oDiv.textContent += `Order No.${idx+1} (${doc.id})\n`+JSON.stringify(info,null,2)+"\n\n";
-              if (info.queue_pos !== undefined) {
-                const qp = Number(info.queue_pos);
-                if (minQueuePos === null || qp < minQueuePos) {
-                  minQueuePos = qp;
-                }
-            }
-            document.getElementById("ordercount").textContent = `Found ${sn.size} order(s)`;
-            if (minQueuePos !== null) {
-              document.getElementById("localqueue").textContent = minQueuePos;
-            }
-            });
+  oDiv.textContent = "";
+  let minQueuePos = null;
+
+  sn.docs.forEach((doc, idx) => {
+    const info = doc.data();
+    if (info.queue_pos !== undefined) {
+      const qp = Number(info.queue_pos);
+      if (!isNaN(qp) && (minQueuePos === null || qp < minQueuePos)) {
+        minQueuePos = qp;
+      }
+    }
+    let html = `
+      <div class="order-card">
+        <div><strong>Order No.${idx + 1} (${doc.id})</strong></div>
+        <div>Status: ${info["ORDER STATUS"] ?? "-"}</div>
+        <div>Timestamp: ${info["Timestamp"] ?? "-"}</div>
+        <hr>
+    `;
+    for (const key in info) {
+      if (key === "ORDER STATUS" || key === "ORDER ID") continue;
+      html += `
+        <div class="order-row">
+          <span>${key}</span>
+          <span>${info[key]}</span>
+        </div>
+      `;
+    }
+    html += `</div>`;
+    oDiv.innerHTML += html;
+  });
+    document.getElementById("ordercount").textContent =
+    `Found ${sn.size} order(s)`;
+
+  if (minQueuePos !== null) {
+    document.getElementById("localqueue").textContent = minQueuePos;
+  } else {
+    document.getElementById("localqueue").textContent = "-";
+  }
+          }
           } else {
             status.textContent = "You currently have no orders";
           }
