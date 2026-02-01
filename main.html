@@ -157,7 +157,7 @@
     `Found ${sn.size} order(s)`;
 
   if (minQueuePos !== null) {
-    document.getElementById("localqueue").textContent = minQueuePos;
+    document.getElementById("localqueue").textContent = Math.max(0, minQueuePos-1);
   } else {
     document.getElementById("localqueue").textContent = "-";
   }
