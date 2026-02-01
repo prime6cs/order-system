@@ -138,7 +138,7 @@
         <div><strong>Order No.${idx + 1} (${doc.id})</strong></div>
         <div>Status: ${info["ORDER STATUS"] ?? "-"}</div>
         <div>Timestamp: ${info["Timestamp"] ?? "-"}</div>
-        <div>Order Total: ${info["TOTAL"] ?? "-"}</div>
+        <div>Order Total: ${info["TOTAL"]+" THB" ?? "-"}</div>
         <hr>
     `;
     for (const key in info) {
